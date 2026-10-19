@@ -487,8 +487,11 @@ section[id], footer[id], .faq details[id] { scroll-margin-top: 76px; }
   .step--last .step-num { background: var(--accent); color: var(--ink); }
   .step h3 { margin: 5px 0 4px; font-size: 18px; line-height: 1.3; }
   .step p { font-size: 15px; }
-  .clips { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
-  .clip { flex: 0 0 68%; scroll-snap-align: start; }
+  /* Clips on phones: 2×2 grid so all four are visible, no sideways scrolling */
+  .clips { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
+  .clip video { border-radius: 12px; }
+  .clip figcaption { margin-top: 8px; line-height: 1.4; }
+  .clip .cap { font-size: 13px; }
   .mini-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .wa-btn { padding: 16px; }
 }

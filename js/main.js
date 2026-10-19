@@ -282,13 +282,21 @@
     });
   }
 
-  /* ---------- Pause clips for reduced motion ---------- */
+  /* ---------- Clips: play only while on screen (saves data and battery) ---------- */
+  var clips = Array.prototype.slice.call(document.querySelectorAll('.clip video'));
+  function play(v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
   if (reduceMotion) {
-    document.querySelectorAll('.clip video').forEach(function (v) {
-      v.removeAttribute('autoplay');
-      v.pause();
-      v.controls = true;
-    });
+    clips.forEach(function (v) { v.controls = true; v.preload = 'metadata'; });
+  } else if (!('IntersectionObserver' in window)) {
+    clips.forEach(play);
+  } else {
+    var clipObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) play(en.target);
+        else en.target.pause();
+      });
+    }, { threshold: 0.25 });
+    clips.forEach(function (v) { clipObs.observe(v); });
   }
 
   var year = document.getElementById('year');

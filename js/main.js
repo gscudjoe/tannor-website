@@ -282,21 +282,23 @@
     });
   }
 
-  /* ---------- Clips: play only while on screen (saves data and battery) ---------- */
+  /* ---------- Clips: autoplay from page load; pause only when far off screen ---------- */
   var clips = Array.prototype.slice.call(document.querySelectorAll('.clip video'));
   function play(v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
   if (reduceMotion) {
-    clips.forEach(function (v) { v.controls = true; v.preload = 'metadata'; });
-  } else if (!('IntersectionObserver' in window)) {
-    clips.forEach(play);
+    clips.forEach(function (v) { v.removeAttribute('autoplay'); v.pause(); v.controls = true; });
   } else {
-    var clipObs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) play(en.target);
-        else en.target.pause();
-      });
-    }, { threshold: 0.25 });
-    clips.forEach(function (v) { clipObs.observe(v); });
+    clips.forEach(play); // nudge browsers that ignore the autoplay attribute
+    if ('IntersectionObserver' in window) {
+      // Generous margin: clips are already playing before they scroll into view.
+      var clipObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) play(en.target);
+          else en.target.pause();
+        });
+      }, { rootMargin: '600px 0px' });
+      clips.forEach(function (v) { clipObs.observe(v); });
+    }
   }
 
   var year = document.getElementById('year');
